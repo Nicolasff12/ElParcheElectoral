@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parche Electoral - Recolección IA</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
+        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #status-message { margin-top: 20px; padding: 10px; border: 1px solid #ddd; background-color: #e9ecef; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Parche Electoral - Recolección de Datos con IA</h1>
+        <p>Haz clic en el botón para iniciar el proceso de recolección de datos de candidatos electorales en Colombia usando IA.</p>
+        <button id="startButton">Iniciar Recolección de Datos</button>
+        <div id="status-message">Esperando para iniciar...</div>
+    </div>
+
+    <script>
+        document.getElementById('startButton').addEventListener('click', function() {
+            const statusDiv = document.getElementById('status-message');
+            statusDiv.textContent = 'Iniciando proceso... esto puede tardar unos segundos. Revisa la consola del servidor para detalles.';
+            statusDiv.style.backgroundColor = '#d1e7dd';
+            statusDiv.style.borderColor = '#badbcc';
+
+            fetch('/iniciar_recoleccion', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}) // No necesitamos enviar datos por ahora
+            })
+            .then(response => response.json())
+            .then(data => {
+                statusDiv.textContent = data.status;
+                statusDiv.style.backgroundColor = '#cce5ff';
+                statusDiv.style.borderColor = '#b8daff';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                statusDiv.textContent = 'Error al iniciar la recolección.';
+                statusDiv.style.backgroundColor = '#f8d7da';
+                statusDiv.style.borderColor = '#f5c6cb';
+            });
+        });
+    </script>
+</body>
+</html>
