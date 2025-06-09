@@ -3,50 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parche Electoral - Recolección IA</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
-        .container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
-        button { padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        #status-message { margin-top: 20px; padding: 10px; border: 1px solid #ddd; background-color: #e9ecef; border-radius: 5px; }
-    </style>
+    <title>Agente IA: Recolección de Datos de Candidatos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>Parche Electoral - Recolección de Datos con IA</h1>
-        <p>Haz clic en el botón para iniciar el proceso de recolección de datos de candidatos electorales en Colombia usando IA.</p>
-        <button id="startButton">Iniciar Recolección de Datos</button>
-        <div id="status-message">Esperando para iniciar...</div>
+        <h1>Agente de Recolección de Datos de Candidatos Presidenciales</h1>
+
+        <div class="form-section">
+            <form action="/iniciar_recoleccion" method="POST">
+                <label for="eleccion">Elección a investigar (Ej: "elecciones presidenciales Colombia 2026"):</label>
+                <input type="text" id="eleccion" name="eleccion" value="elecciones presidenciales Colombia 2026">
+                <button type="submit">Iniciar Recolección de Datos</button>
+            </form>
+        </div>
+
+        {% if message %}
+            <div class="status-message">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        <div class="candidates-section">
+            <h2>Candidatos Recopilados</h2>
+            {% if candidates_data %}
+                {% for candidate in candidates_data %}
+                    <div class="candidate-card">
+                        <h3>{{ candidate.full_name if candidate.full_name else 'Nombre no disponible' }}</h3>
+                        <p><strong>Partido:</strong> {{ candidate.political_party if candidate.political_party else 'No disponible' }}</p>
+                        <p><strong>Fecha de Nacimiento:</strong> {{ candidate.birth_date if candidate.birth_date else 'No disponible' }}</p>
+                        <p><strong>Educación:</strong> {{ candidate.education if candidate.education else 'No disponible' }}</p>
+                        <p><strong>Experiencia:</strong> {{ candidate.experience if candidate.experience else 'No disponible' }}</p>
+                        {% if candidate.main_proposals and candidate.main_proposals != ['null'] %}
+                            <p><strong>Propuestas Principales:</strong></p>
+                            <ul>
+                                {% for proposal in candidate.main_proposals %}
+                                    <li>{{ proposal }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <p><strong>Propuestas Principales:</strong> No disponibles</p>
+                        {% endif %}
+                        {% if candidate.source_url %}
+                            <a href="{{ candidate.source_url }}" target="_blank" class="source-link">Ver Fuente</a>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-data-message">
+                    No se han recopilado datos de candidatos aún. Haz clic en "Iniciar Recolección de Datos" para comenzar.
+                </div>
+            {% endif %}
+        </div>
     </div>
-
-    <script>
-        document.getElementById('startButton').addEventListener('click', function() {
-            const statusDiv = document.getElementById('status-message');
-            statusDiv.textContent = 'Iniciando proceso... esto puede tardar unos segundos. Revisa la consola del servidor para detalles.';
-            statusDiv.style.backgroundColor = '#d1e7dd';
-            statusDiv.style.borderColor = '#badbcc';
-
-            fetch('/iniciar_recoleccion', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({}) // No necesitamos enviar datos por ahora
-            })
-            .then(response => response.json())
-            .then(data => {
-                statusDiv.textContent = data.status;
-                statusDiv.style.backgroundColor = '#cce5ff';
-                statusDiv.style.borderColor = '#b8daff';
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                statusDiv.textContent = 'Error al iniciar la recolección.';
-                statusDiv.style.backgroundColor = '#f8d7da';
-                statusDiv.style.borderColor = '#f5c6cb';
-            });
-        });
-    </script>
 </body>
 </html>
